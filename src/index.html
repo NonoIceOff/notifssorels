@@ -1,0 +1,23 @@
+<!-- src/renderer/index.html -->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Overlay</title>
+
+    <!-- ⚠️ CSP: autorise fetch vers Airtable et le dev server -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      connect-src 'self' https://api.airtable.com http://localhost:* ws://localhost:*;
+      script-src 'self' 'unsafe-eval';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https:;
+      font-src 'self' data:;
+      object-src 'none';
+      base-uri 'self';
+    ">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
