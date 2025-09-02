@@ -1,7 +1,8 @@
-const { app, BrowserWindow, ipcMain, screen, Notification, shell, Tray, Menu } = require("electron");
+const { app, BrowserWindow, ipcMain, screen, Notification, shell, Tray, Menu, nativeImage } = require("electron");
 const path = require("path");
 const axios = require("axios");
-const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
+const { updateElectronApp, UpdateSourceType } = require('update-electron-app');
+const { getAssetPath } = require('./utils/assets');
 
 updateElectronApp({
     updateSource: {
@@ -57,17 +58,19 @@ function createWindow() {
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
             nodeIntegration: false,
             contextIsolation: true
-        }
+        },
+        icon: getAssetPath('icon.png'),
+        title: "Notifications Sorel Energies",
     });
 
 
     // IPC pour ajuster dynamiquement la taille de la fenêtre
     ipcMain.on("set-window-size", (event, { width, height }) => {
         if (win && typeof width === "number" && typeof height === "number") {
-            const { height: screenHeight } = screen.getPrimaryDisplay().workArea;
+            const { width: screenWidth } = screen.getPrimaryDisplay().workArea;
             win.setBounds({
-                x: 0,
-                y: screenHeight - height,
+                x: (screenWidth - width) / 2,
+                y: 20,
                 width,
                 height
             });
@@ -272,7 +275,7 @@ function createWindow() {
             `;
 
             notesWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(notesHtml)}`);
-            
+
             notesWindow.once('ready-to-show', () => {
                 notesWindow.show();
             });
@@ -291,6 +294,7 @@ function createWindow() {
     win.on("resize", () => {
         const [width, height] = win.getSize();
         const { height: screenHeight, width: screenWidth } = screen.getPrimaryDisplay().workArea;
+        console.log({ x: (screenWidth - width) / 2, y: 20, width, height })
         win.setBounds({ x: (screenWidth - width) / 2, y: 20, width, height });
     });
 
@@ -300,20 +304,15 @@ function createWindow() {
 }
 
 function createTray() {
-    // Crée une icône simple avec nativeImage
-    const { nativeImage } = require('electron');
+    const iconPath = getAssetPath('icon.ico');
+    const icon = nativeImage.createFromPath(iconPath);
 
-    // Crée une icône 16x16 simple
-    const icon = nativeImage.createEmpty();
-
-    // Ou utilise une icône par défaut si disponible
-    try {
-        // Essaie de créer une icône simple
-        tray = new Tray(icon);
-    } catch (error) {
-        console.log('Erreur création tray:', error);
+    if (icon.isEmpty()) {
+        console.error('Erreur : impossible de charger l’icône du tray');
         return;
     }
+
+    tray = new Tray(icon);
 
     const contextMenu = Menu.buildFromTemplate([
         {

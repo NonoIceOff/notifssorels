@@ -5,9 +5,18 @@ const path = require('path');
 module.exports = {
     packagerConfig: {
         asar: true,
-        // Force l'inclusion du fichier .env dans le package
+        // Force l'inclusion du fichier .env et des assets dans le package
         extraResource: [
-            '.env'
+            '.env',
+            'assets'
+        ],
+        // Alternative pour les assets
+        extraFiles: [
+            {
+                from: 'assets',
+                to: 'assets',
+                filter: ['**/*']
+            }
         ]
     },
     rebuildConfig: {},

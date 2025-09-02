@@ -17,8 +17,8 @@ function App() {
             height = 1000;
         } 
         if (page === "rappels") {
-            width = 280;
-            height = 232;
+            width = 1032; 
+            height = 140;
         }
         if (window?.electron?.ipcRenderer) {
             window.electron.ipcRenderer.send("set-window-size", { width, height });
@@ -47,18 +47,15 @@ function App() {
             setPage("home");
         };
 
-        if (window?.electronAPI?.onTrayAction) {
-            window.electronAPI.onTrayAction('go-to-home', handleGoToHome);
-            window.electronAPI.onTrayAction('disable-rappel-mode', handleDisableRappelMode);
-        } else if (window?.electron?.ipcRenderer) {
-            window.electron.ipcRenderer.on('go-to-home', handleGoToHome);
-            window.electron.ipcRenderer.on('disable-rappel-mode', handleDisableRappelMode);
+        if (window?.electronAPI) {
+            window.electronAPI.onMessage('go-to-home', handleGoToHome);
+            window.electronAPI.onMessage('disable-rappel-mode', handleDisableRappelMode);
         }
 
         return () => {
-            if (window?.electron?.ipcRenderer) {
-                window.electron.ipcRenderer.removeListener('go-to-home', handleGoToHome);
-                window.electron.ipcRenderer.removeListener('disable-rappel-mode', handleDisableRappelMode);
+            if (window?.electronAPI) {
+                window.electronAPI.removeListener('go-to-home', handleGoToHome);
+                window.electronAPI.removeListener('disable-rappel-mode', handleDisableRappelMode);
             }
         };
     }, []);

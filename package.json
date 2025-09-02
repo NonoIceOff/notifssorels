@@ -1,7 +1,7 @@
 {
     "name": "notifssorel",
     "productName": "NotificationsSorel",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Le logiciel de notifications FUP de Sorel Energies",
     "main": ".webpack/main",
     "scripts": {
@@ -55,8 +55,10 @@
         "electron-log": "^5.4.3",
         "electron-squirrel-startup": "^1.0.1",
         "express": "^5.1.0",
+        "fs": "^0.0.1-security",
         "lucide-react": "^0.542.0",
         "node-fetch": "^2.7.0",
+        "path": "^0.12.7",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
         "update-electron-app": "^3.1.1",
