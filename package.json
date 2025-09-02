@@ -1,46 +1,65 @@
 {
-  "name": "notifssorel",
-  "productName": "notifssorel",
-  "version": "1.0.0",
-  "description": "My Electron application description",
-  "main": ".webpack/main",
-  "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
-  },
-  "keywords": [],
-  "author": {
-    "name": "NonoIceOff",
-    "email": "nonocraft28@gmail.com"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "@babel/core": "^7.28.3",
-    "@babel/preset-react": "^7.27.1",
-    "@electron-forge/cli": "^7.8.3",
-    "@electron-forge/maker-deb": "^7.8.3",
-    "@electron-forge/maker-rpm": "^7.8.3",
-    "@electron-forge/maker-squirrel": "^7.8.3",
-    "@electron-forge/maker-zip": "^7.8.3",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.8.3",
-    "@electron-forge/plugin-fuses": "^7.8.3",
-    "@electron-forge/plugin-webpack": "^7.8.3",
-    "@electron/fuses": "^1.8.0",
-    "@vercel/webpack-asset-relocator-loader": "^1.7.3",
-    "babel-loader": "^10.0.0",
-    "css-loader": "^6.11.0",
-    "electron": "37.3.1",
-    "node-loader": "^2.1.0",
-    "style-loader": "^3.3.4"
-  },
-  "dependencies": {
-    "axios": "^1.11.0",
-    "electron-squirrel-startup": "^1.0.1",
-    "node-fetch": "^2.7.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
-  }
+    "name": "notifssorel",
+    "productName": "NotificationsSorel",
+    "version": "1.0.2",
+    "description": "Le logiciel de notifications FUP de Sorel Energies",
+    "main": ".webpack/main",
+    "scripts": {
+        "start": "electron-forge start",
+        "start-signaling": "node src/signaling-server.js",
+        "dev": "npm run start-signaling & npm run start",
+        "package": "electron-forge package",
+        "make": "electron-forge make",
+        "publish": "electron-forge publish",
+        "lint": "echo \"No linting configured\"",
+        "clean": "rimraf dist",
+        "build": "npm run clean && electron-builder"
+    },
+    "keywords": [],
+    "author": {
+        "name": "NonoIceOff",
+        "email": "nonocraft28@gmail.com"
+    },
+    "build": {
+        "appId": "fr.sorelenergies.notifications",
+        "productName": "NotificationsSorel",
+        "win": {
+            "target": "nsis"
+        }
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "@babel/core": "^7.28.3",
+        "@babel/preset-env": "^7.28.3",
+        "@babel/preset-react": "^7.27.1",
+        "@electron-forge/cli": "^7.8.3",
+        "@electron-forge/maker-deb": "^7.8.3",
+        "@electron-forge/maker-rpm": "^7.8.3",
+        "@electron-forge/maker-squirrel": "^7.8.3",
+        "@electron-forge/maker-zip": "^7.8.3",
+        "@electron-forge/plugin-auto-unpack-natives": "^7.8.3",
+        "@electron-forge/plugin-fuses": "^7.8.3",
+        "@electron-forge/plugin-webpack": "^7.8.3",
+        "@electron/fuses": "^1.8.0",
+        "@vercel/webpack-asset-relocator-loader": "^1.7.3",
+        "babel-loader": "^10.0.0",
+        "css-loader": "^6.11.0",
+        "electron": "37.3.1",
+        "electron-builder": "^26.0.12",
+        "node-loader": "^2.1.0",
+        "style-loader": "^3.3.4"
+    },
+    "dependencies": {
+        "axios": "^1.11.0",
+        "dotenv": "^17.2.1",
+        "electron-log": "^5.4.3",
+        "electron-squirrel-startup": "^1.0.1",
+        "express": "^5.1.0",
+        "lucide-react": "^0.542.0",
+        "node-fetch": "^2.7.0",
+        "react": "^19.1.1",
+        "react-dom": "^19.1.1",
+        "update-electron-app": "^3.1.1",
+        "ws": "^8.18.3"
+    }
 }

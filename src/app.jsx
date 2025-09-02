@@ -1,94 +1,90 @@
-
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import Home from "./pages/Home.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Rappels from "./pages/Rappels.jsx";
 
-import Dashboard from "./Dashboard.jsx";
-
-const AIRTABLE_BASE = "appFeaGqAHejv7iLp";
-const AIRTABLE_TABLE = "tbl88zJhSHXTUfsUv";
-const AIRTABLE_PAT = "patZthA3gTAMyiwHA.a6eae1969fdd5e39de9a533caf133941c8e23e8c974e3bd87a710f6ecd4cc75a";
-
-export default function App() {
+function App() {
     const [data, setData] = useState(null);
     const [err, setErr] = useState("");
-    const [page, setPage] = useState("home");
+    const [page, setPage] = useState("rappels");
     const [selected, setSelected] = useState(null);
 
     useEffect(() => {
-        (async () => {
-            try {
-                const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/${AIRTABLE_TABLE}`;
-                const res = await axios.get(url, {
-                    headers: { Authorization: `Bearer ${AIRTABLE_PAT}` }
-                });
-                console.log("data", res.data);
-                setData(res.data); // on stocke tout tel quel
-            } catch (e) {
-                console.log(e.message);
-                setErr(e.message);
+        let width = 232;
+        let height = 332;
+        if (page === "dashboard") {
+            width = 600;
+            height = 1000;
+        } 
+        if (page === "rappels") {
+            width = 280;
+            height = 232;
+        }
+        if (window?.electron?.ipcRenderer) {
+            window.electron.ipcRenderer.send("set-window-size", { width, height });
+        } else if (window?.electronAPI?.setWindowSize) {
+            window.electronAPI.setWindowSize({ width, height });
+        }
+    }, [page]);
+
+    useEffect(() => {
+        // Vérifier si plus de 10 minutes se sont écoulées
+        if (page === "rappels") {
+            if (window?.electron?.ipcRenderer) {
+                console.log("Envoi check-10-minutes");
+                window.electron.ipcRenderer.send("check-10-minutes");
             }
-        })();
+        }
+    }, [page]);
+
+    // Gestionnaires d'événements pour le system tray
+    useEffect(() => {
+        const handleGoToHome = () => {
+            setPage("home");
+        };
+
+        const handleDisableRappelMode = () => {
+            setPage("home");
+        };
+
+        if (window?.electronAPI?.onTrayAction) {
+            window.electronAPI.onTrayAction('go-to-home', handleGoToHome);
+            window.electronAPI.onTrayAction('disable-rappel-mode', handleDisableRappelMode);
+        } else if (window?.electron?.ipcRenderer) {
+            window.electron.ipcRenderer.on('go-to-home', handleGoToHome);
+            window.electron.ipcRenderer.on('disable-rappel-mode', handleDisableRappelMode);
+        }
+
+        return () => {
+            if (window?.electron?.ipcRenderer) {
+                window.electron.ipcRenderer.removeListener('go-to-home', handleGoToHome);
+                window.electron.ipcRenderer.removeListener('disable-rappel-mode', handleDisableRappelMode);
+            }
+        };
     }, []);
 
-    console.log("data", data);
+    console.log("Rendu App", { page, selected });
 
     return (
-        <div
-            style={{
-                position: "fixed",
-                left: 16,
-                bottom: 16,
-                zIndex: 9999,
-                background: "rgba(0,0,0,0.9)",
-                color: "white",
-                padding: 8,
-                borderRadius: 12,
-                fontFamily: "system-ui, Arial, sans-serif",
-                WebkitAppRegion: "drag",
-                boxShadow: "0 4px 24px 0 rgba(0,0,0,0.25)",
-                height: 368,
-                width: 180,
-            }}
-        >
+        <>
             {page === "home" && (
-                <>
-                    <h3 style={{ margin: 0 }}>Qui êtes-vous ?</h3>
-                    {err && (
-                        <p style={{ color: "#ff6b6b", marginTop: 1, WebkitAppRegion: "no-drag" }}>
-                            Erreur: {err}
-                        </p>
-                    )}
-                    <ul style={{ marginTop: 10, paddingLeft: 16, WebkitAppRegion: "no-drag" }}>
-                        {data &&
-                            data.records.map((rec) => (
-                                <li key={rec.id} style={{ listStyle: "none", marginBottom: 6 }}>
-                                    <button
-                                        style={{
-                                            cursor: "pointer",
-                                            padding: "6px 16px",
-                                            borderRadius: 6,
-                                            border: "none",
-                                            background: "#fff",
-                                            color: "#222",
-                                            fontWeight: 600,
-                                            fontSize: 16,
-                                            WebkitAppRegion: "no-drag"
-                                        }}
-                                        onClick={() => {
-                                            setSelected(rec);
-                                            setPage("dashboard");
-                                        }}
-                                    >
-                                        {rec.fields["Prénom"]}
-                                    </button>
-                                </li>
-                            ))}
-                    </ul>
-                </>
+                <Home
+                    data={data}
+                    err={err}
+                    onSelect={(rec) => {
+                        setSelected(rec);
+                        console.log("Commercial sélectionné :", rec);
+                        setPage("dashboard");
+                    }}
+                    onRappels={() => setPage("rappels")}
+                />
             )}
             {page === "dashboard" && (
                 <Dashboard commercial={selected} onBack={() => setPage("home")} />
             )}
-        </div>
+            {page === "rappels" && <Rappels onBack={() => setPage("home")} />}
+        </>
     );
 }
+
+export default App;

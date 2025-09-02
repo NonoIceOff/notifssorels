@@ -1,9 +1,14 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const path = require('path');
 
 module.exports = {
     packagerConfig: {
         asar: true,
+        // Force l'inclusion du fichier .env dans le package
+        extraResource: [
+            '.env'
+        ]
     },
     rebuildConfig: {},
     makers: [
@@ -46,10 +51,6 @@ module.exports = {
                         },
                     ],
                 },
-
-                // 👇 Ajout de la CSP de dev (autorisations fetch)
-                devContentSecurityPolicy: "default-src 'self' 'unsafe-inline' data:; connect-src 'self' https://api.airtable.com http://localhost:* ws://localhost:*; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval';",
-
             },
         },
         new FusesPlugin({

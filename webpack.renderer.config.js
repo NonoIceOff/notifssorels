@@ -1,13 +1,19 @@
-const rules = require('./webpack.rules');
-
-rules.push({
-  test: /\.css$/,
-  use: [{ loader: 'style-loader' }, { loader: 'css-loader' }],
-});
-
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
-  // Put your normal webpack config below here
   module: {
-    rules,
+    rules: [
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+        },
+      },
+    ],
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "./src/index.html", // ton point d’entrée React
+    }),
+  ],
 };
