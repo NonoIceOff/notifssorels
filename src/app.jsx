@@ -70,7 +70,6 @@ function App() {
                     err={err}
                     onSelect={(rec) => {
                         setSelected(rec);
-                        console.log("Commercial sélectionné :", rec);
                         setPage("dashboard");
                     }}
                     onRappels={() => setPage("rappels")}
@@ -79,7 +78,7 @@ function App() {
             {page === "dashboard" && (
                 <Dashboard commercial={selected} onBack={() => setPage("home")} />
             )}
-            {page === "rappels" && <Rappels onBack={() => setPage("home")} />}
+            {page === "rappels" && <Rappels commercial={selected} onBack={() => setPage("home")} />}
         </>
     );
 }

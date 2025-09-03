@@ -1,4 +1,3 @@
-// Serveur de signaling simple pour WebRTC
 const WebSocket = require('ws');
 const express = require('express');
 const http = require('http');
@@ -17,7 +16,6 @@ wss.on('connection', (ws) => {
         try {
             const data = JSON.parse(message);
             
-            // Diffuse le message à tous les autres clients
             clients.forEach(client => {
                 if (client !== ws && client.readyState === WebSocket.OPEN) {
                     client.send(message);

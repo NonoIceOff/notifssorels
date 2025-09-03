@@ -59,7 +59,7 @@ function createWindow() {
             nodeIntegration: false,
             contextIsolation: true
         },
-        icon: getAssetPath('icon.png'),
+        icon: getAssetPath('icon.ico'),
         title: "Notifications Sorel Energies",
     });
 
@@ -76,9 +76,6 @@ function createWindow() {
             });
         }
     });
-
-
-    // S'assure que la fenêtre est toujours cliquable (pas de setIgnoreMouseEvents)
 
     win.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
@@ -175,10 +172,17 @@ function createWindow() {
             const url = `${data.urlInterraction}`;
             const AIRTABLE_PAT = process.env.AIRTABLE_PAT;
             console.log("URL pour mise à jour:", url);
+
+            // Choix du champ selon la source
+            const commercialField = data.source === "Borne" ? "Contact SOREL" : "Commercial SOREL";
+
             const response = await axios.patch(
                 url,
                 {
-                    fields: { "Je traite": true },
+                    fields: {
+                        "Je traite": true,
+                        [commercialField]: data.commercialId
+                    },
                     typecast: true
                 },
                 {
@@ -205,6 +209,48 @@ function createWindow() {
         }
     });
 
+
+    ipcMain.handle('change-date-fup', async (event, data) => {
+        try {
+            console.log("Changement date FUP:", data);
+            const AIRTABLE_PAT = process.env.AIRTABLE_PAT;
+
+            // Choix de l'URL et du champ de date selon la source
+            let clientURL;
+            let dateField;
+
+            if (data.source === "Borne") {
+                clientURL = `https://api.airtable.com/v0/appFeaGqAHejv7iLp/tblgprO8dgROULLrI/${data.clientId}`;
+                dateField = "FUP INTERRACTION ";
+            } else {
+                clientURL = `https://api.airtable.com/v0/appdqWTPlSySyDboC/tblHSte1gYJhkdFUB/${data.clientId}`;
+                dateField = "FUP Interraction";
+            }
+
+            const response = await axios.patch(
+                clientURL,
+                {
+                    fields: {
+                        [dateField]: data.newDate
+                    },
+                    typecast: true
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${AIRTABLE_PAT}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            console.log("Mise à jour date FUP réussie:", response.data);
+            return { success: true, data: response.data };
+        } catch (e) {
+            console.error("Erreur changement date FUP:", e.message);
+            return { error: e.message };
+        }
+    });
+
     // Handler pour ouvrir une fenêtre de notes
     ipcMain.handle('open-notes-window', async (event, data) => {
         try {
@@ -224,7 +270,7 @@ function createWindow() {
                 show: false
             });
 
-            // Contenu HTML simple pour afficher les notes
+            // Contenu HTML pour afficher les notes
             const notesHtml = `
                 <!DOCTYPE html>
                 <html>
@@ -281,7 +327,7 @@ function createWindow() {
             });
 
             notesWindow.on('closed', () => {
-                // Fenêtre fermée
+                notesWindow.hide();
             });
 
             return { success: true };
@@ -364,7 +410,6 @@ function createTray() {
     tray.setToolTip('NotifsSorel - Gestionnaire de rappels');
     tray.setContextMenu(contextMenu);
 
-    // Double-clic pour afficher/masquer la fenêtre
     tray.on('double-click', () => {
         if (win) {
             if (win.isVisible()) {

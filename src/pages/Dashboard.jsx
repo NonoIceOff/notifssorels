@@ -18,7 +18,7 @@ export default function Dashboard({ commercial, onBack }) {
             url = `https://airtable.com/appdqWTPlSySyDboC/tblHSte1gYJhkdFUB/${fup.fields?.["recordId_client"]}`;
             apiurl = `https://api.airtable.com/v0/appdqWTPlSySyDboC/tblWhxRcecJC0r0E4/${fup.id}`;
         }
-        // Ouverture de la fiche client
+        // ouverture de la fiche client
         try {
             const result = await window.electronAPI.openExternal(url);
             if (result && result.error) {
@@ -27,17 +27,17 @@ export default function Dashboard({ commercial, onBack }) {
         } catch (e) {
             console.error("Erreur openExternal:", e);
         }
-        // Déclaration de traitement sur airtable
+        // déclaration de traitement sur airtable
         try {
             window.electronAPI.invoke('declare-treatment', { nextFupId: fup.id, urlInterraction: apiurl });
         } catch (error) {
             console.error("Erreur déclaration traitement:", error);
         }
-        // Supprime le FUP traité de la liste
+        // supprime le FUP traité de la liste
         setAllFups(currentFups => currentFups.filter(f => f.id !== fup.id));
     };
 
-    // Fetch commerciaux via IPC sécurisé
+    // fetch commerciaux via IPC sécurisé
     useEffect(() => {
         (async () => {
             try {
@@ -54,7 +54,7 @@ export default function Dashboard({ commercial, onBack }) {
         })();
     }, []);
 
-    // Fetch FUPs via IPC sécurisé
+    // fetch FUPs via IPC sécurisé
     useEffect(() => {
         (async () => {
             try {
@@ -73,8 +73,6 @@ export default function Dashboard({ commercial, onBack }) {
         })();
     }, []);
 
-    // Toute la fenêtre est cliquable, aucune gestion pointerEvents/clickable
-
     return (
         <div style={{ background: "rgba(0,0,0,0.92)", color: "white", borderRadius: 12, padding: 12, minWidth: 220 }}>
             <div style={{ marginBottom: 8 }}>
@@ -90,32 +88,7 @@ export default function Dashboard({ commercial, onBack }) {
                 </div>
                 <h3 style={{ margin: 0, fontFamily: "Arial, sans-serif" }}>Les FUP restants</h3>
             </div>
-            {/* <div style={{ marginBottom: 12 }}>
-                <p style={{ margin: 0, fontWeight: 600 }}>Sélectionnez un commercial :</p>
-                <ul style={{ marginTop: 6, paddingLeft: 0, display: "flex", flexWrap: "wrap", gap: 6, WebkitAppRegion: "no-drag" }}>
-                    {commerciaux.map((rec) => (
-                        <li key={rec.id} style={{ listStyle: "none" }}>
-                            <button
-                                className="clickable"
-                                style={{
-                                    cursor: "pointer",
-                                    padding: "6px 12px",
-                                    borderRadius: 6,
-                                    border: selected && selected.id === rec.id ? "2px solid #1dfa00ff" : "none",
-                                    background: selected && selected.id === rec.id ? "#1dfa00ff" : "#fff",
-                                    color: selected && selected.id === rec.id ? "#fff" : "#222",
-                                    fontWeight: 600,
-                                    fontSize: 15,
-                                    WebkitAppRegion: "no-drag"
-                                }}
-                                onClick={() => setSelected(rec)}
-                            >
-                                {rec.fields["Prénom"]}
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            </div> */}
+            
             {err && <p style={{ color: "#ff6b6b" }}>{err}</p>}
             <div
                 style={{

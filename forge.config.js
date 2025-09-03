@@ -4,13 +4,12 @@ const path = require('path');
 
 module.exports = {
     packagerConfig: {
+        icon: "../assets/icon",
         asar: true,
-        // Force l'inclusion du fichier .env et des assets dans le package
         extraResource: [
             '.env',
             'assets'
         ],
-        // Alternative pour les assets
         extraFiles: [
             {
                 from: 'assets',
@@ -23,7 +22,9 @@ module.exports = {
     makers: [
         {
             name: '@electron-forge/maker-squirrel',
-            config: {},
+            config: {
+                setupIcon: './assets/icon.ico'
+            },
         },
         {
             name: '@electron-forge/maker-zip',

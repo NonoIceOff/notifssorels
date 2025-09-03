@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function useRappelsLogic() {
+export function useRappelsLogic(commercial) {
     const [nextFup, setNextFup] = useState(null);
     const [currentFupIndex, setCurrentFupIndex] = useState(0);
     const [countdown, setCountdown] = useState("");
@@ -32,7 +32,6 @@ export function useRappelsLogic() {
             setCurrentFupIndex(nextIndex);
             const currentFup = sorted[nextIndex];
             
-            // Si c'est un nouveau FUP, enregistrer le moment de début
             if (!nextFup || currentFup.id !== nextFup.id) {
                 setFupStartTime(now);
             }
@@ -67,7 +66,6 @@ export function useRappelsLogic() {
 
     const playAlert = () => {
         try {
-            // Crée un son simple avec Web Audio API
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
@@ -84,7 +82,6 @@ export function useRappelsLogic() {
             oscillator.stop(audioContext.currentTime + 0.5);
         } catch (error) {
             console.log('Impossible de jouer le son:', error);
-            // Fallback : utiliser une notification système
             if (window.Notification && Notification.permission === "granted") {
                 new Notification("🔔 Mode Rappels", { body: "Activé", silent: false });
             }
@@ -105,16 +102,12 @@ export function useRappelsLogic() {
         const fupTime = new Date(nextFup.date);
         const startTime = new Date(fupStartTime);
 
-        // Si le FUP est passé, 100%
         if (fupTime <= now) return 100;
 
-        // Durée totale entre le moment où le FUP est devenu actif et l'heure du FUP
         const totalDuration = fupTime - startTime;
 
-        // Temps écoulé depuis le début
         const elapsed = now - startTime;
 
-        // Pourcentage basé sur le temps écoulé
         return Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100);
     };
 
@@ -129,7 +122,8 @@ export function useRappelsLogic() {
             url = `https://airtable.com/appdqWTPlSySyDboC/tblHSte1gYJhkdFUB/${clientId}`;
             apiurl = `https://api.airtable.com/v0/appdqWTPlSySyDboC/tblWhxRcecJC0r0E4/${nextFup.id}`;
         }
-        // Ouverture de la fiche client
+        let commercialId = commercial?.id;
+        console.log("Commercial ID sélectionné:", commercialId);
         try {
             const result = await window.electronAPI.openExternal(url);
             if (result && result.error) {
@@ -138,9 +132,8 @@ export function useRappelsLogic() {
         } catch (e) {
             console.error("Erreur openExternal:", e);
         }
-        // Déclaration de traitement sur airtable
         try {
-            window.electronAPI.invoke('declare-treatment', { nextFupId: nextFup.id, urlInterraction: apiurl });
+            window.electronAPI.invoke('declare-treatment', { nextFupId: nextFup.id, urlInterraction: apiurl, commercialId: commercialId });
         } catch (error) {
             console.error("Erreur déclaration traitement:", error);
         }
@@ -149,7 +142,6 @@ export function useRappelsLogic() {
         setAllFups(remainingFups);
         loadNextFup(remainingFups);
 
-        // Diffuse via WebRTC que ce FUP a été traité
         if (syncManager) {
             syncManager.broadcastFUPTreated(nextFup.id);
         }
@@ -159,22 +151,18 @@ export function useRappelsLogic() {
         if (!nextFup) return;
 
         try {
-            // Calcule la nouvelle date
             const currentDate = new Date(nextFup.date);
             const newDate = new Date(currentDate.getTime() + (minutes * 60 * 1000));
 
-            // Met à jour localement
             const updatedFup = { ...nextFup, date: newDate.toISOString() };
             setNextFup(updatedFup);
 
-            // Met à jour dans la liste
             const updatedFups = allFups.map(f =>
                 f.id === nextFup.id ? updatedFup : f
             );
             setAllFups(updatedFups);
             loadNextFup(updatedFups);
 
-            // Ferme la popup
             setShowReportPopup(false);
 
             console.log(`FUP reporté de ${minutes} minutes`);
@@ -185,7 +173,6 @@ export function useRappelsLogic() {
     };
 
     return {
-        // States
         nextFup,
         currentFupIndex,
         countdown,
@@ -201,7 +188,7 @@ export function useRappelsLogic() {
         showReportPopup,
         fupStartTime,
         hoveredFup,
-        // Setters
+
         setNextFup,
         setCurrentFupIndex,
         setCountdown,
@@ -217,7 +204,7 @@ export function useRappelsLogic() {
         setShowReportPopup,
         setFupStartTime,
         setHoveredFup,
-        // Functions
+
         loadNextFup,
         navigateToFup,
         getPreviousFup,

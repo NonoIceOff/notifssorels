@@ -9,8 +9,8 @@ import RappelsActionButton from "../components/Rappels/RappelsActionButton.jsx";
 import RappelsNavigation from "../components/Rappels/RappelsNavigation.jsx";
 import RappelsReportPopup from "../components/Rappels/RappelsReportPopup.jsx";
 
-export default function Rappels({ onBack }) {
-    const rappelsState = useRappelsLogic();
+export default function Rappels({ commercial, onBack }) {
+    const rappelsState = useRappelsLogic(commercial);
 
     const {
         nextFup,
@@ -28,7 +28,7 @@ export default function Rappels({ onBack }) {
         showReportPopup,
         fupStartTime,
         hoveredFup,
-        // Setters
+
         setNextFup,
         setCurrentFupIndex,
         setCountdown,
@@ -44,7 +44,7 @@ export default function Rappels({ onBack }) {
         setShowReportPopup,
         setFupStartTime,
         setHoveredFup,
-        // Functions
+
         loadNextFup,
         navigateToFup,
         getPreviousFup,
@@ -56,7 +56,6 @@ export default function Rappels({ onBack }) {
         onReportFup
     } = rappelsState;
 
-    // Utilise les effets
     useRappelsEffects({
         setSyncManager,
         syncManager,
@@ -71,7 +70,7 @@ export default function Rappels({ onBack }) {
         setNotificationSent
     });
 
-    // Effet pour redimensionner la fenêtre dynamiquement selon l'état expanded/collapsed
+    // redimensionner la fenêtre dynamiquement selon l'état expanded/collapsed
     useEffect(() => {
         const baseWidth = isExpanded ? 1032 : 400;
         const baseHeight = isExpanded ? 140 : 64;
@@ -90,6 +89,7 @@ export default function Rappels({ onBack }) {
     }, [isExpanded]);
 
     if (!isVisible) return null;
+    console.log("Commercial", commercial?.id);
 
     return (
         <div style={{
@@ -116,11 +116,11 @@ export default function Rappels({ onBack }) {
                                 onBack={onBack}
                             />
 
-                            {/* Contenu repliable */}
+                            {/* repliable */}
                             {isExpanded && (
                                 <>
                                     <div style={{ display: "flex", flexDirection: "row", gap: 16, justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                                        {/* Navigation gauche (précédent) */}
+                                        {/* gauche (précédent) */}
                                         <RappelsNavigation
                                             side="left"
                                             sortedFups={sortedFups}
@@ -131,7 +131,7 @@ export default function Rappels({ onBack }) {
                                             hoveredFup={hoveredFup}
                                             setHoveredFup={setHoveredFup} />
 
-                                        {/* Contenu central */}
+                                        {/* centre */}
                                         <div style={{ display: "flex", flexDirection: "row", gap: 16, justifyContent: "space-between", flex: 1 }}>
                                             <RappelsCountdown
                                                 nextFup={nextFup}
@@ -150,7 +150,7 @@ export default function Rappels({ onBack }) {
                                                 onBack={onBack} />
                                         </div>
 
-                                        {/* Navigation droite (suivant) */}
+                                        {/* droite (suivant) */}
                                         <RappelsNavigation
                                             side="right"
                                             sortedFups={sortedFups}

@@ -35,7 +35,6 @@ export function useRappelsEffects({
             }
         };
 
-        // Essaie d'initialiser WebRTC après un petit délai
         setTimeout(initWebRTC, 1000);
 
         return () => {
@@ -100,7 +99,7 @@ export function useRappelsEffects({
         return () => clearInterval(interval);
     }, [nextFup]);
 
-    // Notification unique
+    // Notification
     useEffect(() => {
         if (!nextFup || notificationSent) return;
         const now = new Date();

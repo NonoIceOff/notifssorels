@@ -1,4 +1,3 @@
-// Module WebRTC pour synchronisation FUP
 class FUPSyncManager {
     constructor() {
         this.localConnection = null;
@@ -8,12 +7,10 @@ class FUPSyncManager {
         this.isInitiator = false;
     }
 
-    // Initialise la connexion WebRTC
     async init(onFUPTreated) {
         this.onFUPTreatedCallback = onFUPTreated;
         
         try {
-            // Connexion au serveur de signaling
             this.signalingSocket = new WebSocket('ws://localhost:3001');
             
             this.signalingSocket.onopen = () => {
@@ -40,15 +37,13 @@ class FUPSyncManager {
             iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
         });
 
-        // Crée le data channel pour l'initiateur
-        if (Math.random() > 0.5) { // 50% de chance d'être initiateur
+        if (Math.random() > 0.5) {
             this.isInitiator = true;
             this.dataChannel = this.localConnection.createDataChannel('fup-sync');
             this.setupDataChannel(this.dataChannel);
             this.createOffer();
         }
 
-        // Écoute les data channels entrants
         this.localConnection.ondatachannel = (event) => {
             if (!this.dataChannel) {
                 this.dataChannel = event.channel;
@@ -56,7 +51,6 @@ class FUPSyncManager {
             }
         };
 
-        // Gestion des candidats ICE
         this.localConnection.onicecandidate = (event) => {
             if (event.candidate) {
                 this.sendSignalingMessage({
@@ -176,5 +170,4 @@ class FUPSyncManager {
     }
 }
 
-// Export pour utilisation dans le renderer process
 window.FUPSyncManager = FUPSyncManager;

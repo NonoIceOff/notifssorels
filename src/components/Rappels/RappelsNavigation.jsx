@@ -2,7 +2,7 @@ import React from "react";
 import { SquareArrowLeft, SquareArrowRight, Phone, BookA } from 'lucide-react';
 
 export default function RappelsNavigation({
-    side, // "left" ou "right"
+    side,
     sortedFups,
     currentFupIndex,
     getPreviousFup,
@@ -13,7 +13,7 @@ export default function RappelsNavigation({
 }) {
     if (sortedFups.length <= 1) return null;
 
-    // Affichage de la navigation gauche (précédent)
+    // navigation gauche (précédent)
     if (side === "left") {
         return (
             <div style={{
@@ -21,7 +21,6 @@ export default function RappelsNavigation({
                 alignItems: "center",
                 minWidth: 100,
             }}>
-                {/* FUP Précédent */}
                 <div
                     style={{
                         cursor: getPreviousFup() ? "pointer" : "default",
@@ -84,7 +83,7 @@ export default function RappelsNavigation({
                         </div>
                     </div>
 
-                    {/* Tooltip précédent */}
+                    {/* précédent */}
                     {hoveredFup === 'prev' && getPreviousFup() && (
                         <div style={{
                             position: "absolute",
@@ -118,7 +117,7 @@ export default function RappelsNavigation({
         );
     }
 
-    // Affichage de la navigation droite (suivant)
+    // navigation droite (suivant)
     if (side === "right") {
         return (
             <div style={{
@@ -127,7 +126,6 @@ export default function RappelsNavigation({
                 minWidth: 100,
                 justifyContent: "flex-end",
             }}>
-                {/* FUP Suivant */}
                 <div
                     style={{
                         display: "flex",
@@ -191,7 +189,7 @@ export default function RappelsNavigation({
                         <SquareArrowRight size={12} color="#ccc" />
                     </div>
 
-                    {/* Tooltip suivant */}
+                    {/* suivant */}
                     {hoveredFup === 'next' && getNextFup() && (
                         <div style={{
                             position: "absolute",
@@ -225,7 +223,6 @@ export default function RappelsNavigation({
         );
     }
 
-    // Fallback : affichage d'un indicateur simple au centre
     return (
         <div style={{
             display: "flex",

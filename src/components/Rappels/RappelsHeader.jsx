@@ -35,7 +35,7 @@ export default function RappelsHeader({
                 }
             </button>
 
-            {/* Affichage quand étendu */}
+            {/* étendu */}
             {isExpanded && (
                 <div style={{
                     fontSize: 11,
@@ -64,7 +64,7 @@ export default function RappelsHeader({
                 </div>
             )}
 
-            {/* Affichage quand replié */}
+            {/* replié */}
             {!isExpanded && (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "70%" }}>
                     <div style={{
