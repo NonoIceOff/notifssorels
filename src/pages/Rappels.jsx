@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRappelsLogic } from "../components/Rappels/useRappelsLogic.js";
 import { useRappelsEffects } from "../components/Rappels/useRappelsEffects.js";
 import RappelsLoadingState, { RappelsEmptyState } from "../components/Rappels/RappelsLoadingState.jsx";
@@ -9,7 +9,35 @@ import RappelsActionButton from "../components/Rappels/RappelsActionButton.jsx";
 import RappelsNavigation from "../components/Rappels/RappelsNavigation.jsx";
 import RappelsReportPopup from "../components/Rappels/RappelsReportPopup.jsx";
 
-export default function Rappels({ commercial, onBack }) {
+export default function Rappels({ commercial: initialCommercial, onBack }) {
+    const [commercial, setCommercial] = useState(initialCommercial || null);
+    const [commerciaux, setCommerciaux] = useState([]);
+    const [loadingCommerciaux, setLoadingCommerciaux] = useState(true);
+    const [errCommerciaux, setErrCommerciaux] = useState("");
+
+    useEffect(() => {
+        (async () => {
+            try {
+                setLoadingCommerciaux(true);
+                let commerciauxData = [];
+                if (window?.electronAPI?.invoke) {
+                    commerciauxData = await window.electronAPI.invoke('get-commerciaux');
+                }
+                if (commerciauxData && commerciauxData.error) throw new Error(commerciauxData.error);
+                commerciauxData = Array.isArray(commerciauxData) ? commerciauxData : [];
+                // On mappe pour garder id et nom/prénom
+                setCommerciaux(commerciauxData.map(rec => ({
+                    id: rec.id,
+                    nom: rec.fields?.["Prénom"] || rec.fields?.["Nom"] || "?"
+                })));
+            } catch (e) {
+                setErrCommerciaux("Erreur chargement commerciaux: " + e.message);
+            } finally {
+                setLoadingCommerciaux(false);
+            }
+        })();
+    }, []);
+
     const rappelsState = useRappelsLogic(commercial);
 
     const {
@@ -114,6 +142,9 @@ export default function Rappels({ commercial, onBack }) {
                                 setIsExpanded={setIsExpanded}
                                 setShowReportPopup={setShowReportPopup}
                                 onBack={onBack}
+                                commercial={commercial}
+                                commerciaux={commerciaux}
+                                onSelectCommercial={setCommercial}
                             />
 
                             {/* repliable */}

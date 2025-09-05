@@ -1,4 +1,5 @@
 import React from "react";
+import CommercialSelector from "./CommercialSelector.jsx";
 import { SquareMinus, SquarePlus, AlarmClock, Clock, LayoutDashboard } from 'lucide-react';
 import { Phone, BookA } from 'lucide-react';
 
@@ -7,7 +8,10 @@ export default function RappelsHeader({
     isExpanded,
     setIsExpanded,
     setShowReportPopup,
-    onBack
+    onBack,
+    commercial,
+    commerciaux = [],
+    onSelectCommercial
 }) {
     return (
         <div style={{
@@ -34,33 +38,49 @@ export default function RappelsHeader({
                     <SquarePlus color="#ffffffff" size={16} />
                 }
             </button>
+            
 
             {/* étendu */}
             {isExpanded && (
-                <div style={{
-                    fontSize: 11,
-                    fontFamily: "Arial, sans-serif",
-                    opacity: 0.8,
-                    color: "#ccc",
-                    display: "flex",
-                    flexDirection: "row",
-                    alignContent: "center",
-                    gap: "4vw"
-                }}>
-                    |
-                    <p style={{ fontWeight: 800, color: "#ffffffff", fontSize: 12 }}>{nextFup.fields?.["Nom client"] || "Client"} </p>
-                    |
-                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "1vw" }}>
-                        <BookA size={12} color="#0099ffff" strokeWidth={3} />
-                        <p style={{ fontWeight: 800, color: "#0099ffff", fontSize: 12 }}>{nextFup.source}</p>
+                <div style={{ display: "flex", width: "100%", alignItems: "center", justifyContent: "center" }}>
+                    {/* Commercial tout à gauche */}
+                    <div style={{ minWidth: 120, textAlign: "left" }}>
+                        {commercial && commercial.nom ? (
+                            <p style={{fontSize: 10}}>Commercial : {commercial.nom}</p>
+                        ) : (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <span style={{fontSize: 10, color: '#ff9500'}}>Commercial :</span>
+                                <CommercialSelector commerciaux={commerciaux} onSelect={onSelectCommercial} />
+                            </div>
+                        )}
                     </div>
-                    |
-                    <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "1vw" }}>
-                        <Phone size={12} color="#ffffffff" strokeWidth={3} />
-                        <p style={{ fontWeight: 800, color: "#ffffffff", fontSize: 12 }}>{nextFup.fields?.["Téléphone"] || "Numéro inconnu"} </p>
+                    {/* Infos client centrées */}
+                    <div style={{
+                        fontSize: 11,
+                        fontFamily: "Arial, sans-serif",
+                        opacity: 0.8,
+                        color: "#ccc",
+                        display: "flex",
+                        flexDirection: "row",
+                        alignContent: "center",
+                        gap: "4vw",
+                        flex: 1,
+                        justifyContent: "center"
+                    }}>
+                        |
+                        <p style={{ fontWeight: 800, color: "#ffffffff", fontSize: 12 }}>{nextFup.fields?.["Nom client"] || "Client"} </p>
+                        |
+                        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "1vw" }}>
+                            <BookA size={12} color="#0099ffff" strokeWidth={3} />
+                            <p style={{ fontWeight: 800, color: "#0099ffff", fontSize: 12 }}>{nextFup.source}</p>
+                        </div>
+                        |
+                        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "1vw" }}>
+                            <Phone size={12} color="#ffffffff" strokeWidth={3} />
+                            <p style={{ fontWeight: 800, color: "#ffffffff", fontSize: 12 }}>{nextFup.fields?.["Téléphone"] || "Numéro inconnu"} </p>
+                        </div>
+                        |
                     </div>
-                    |
-
                 </div>
             )}
 

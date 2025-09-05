@@ -172,9 +172,18 @@ function createWindow() {
             const url = `${data.urlInterraction}`;
             const AIRTABLE_PAT = process.env.AIRTABLE_PAT;
             console.log("URL pour mise à jour:", url);
+            console.log("Données envoyées:", data.source);
 
-            // Choix du champ selon la source
-            const commercialField = data.source === "Borne" ? "Contact SOREL" : "Commercial SOREL";
+            // Correction : si data.source n'est pas fourni, on le déduit de l'URL
+            let source = data.source;
+            if (!source) {
+                if (url.includes("appFeaGqAHejv7iLp")) {
+                    source = "Borne";
+                } else {
+                    source = "Batterie";
+                }
+            }
+            const commercialField = source === "Borne" ? "Contact SOREL" : "Commercial SOREL";
 
             const response = await axios.patch(
                 url,
@@ -327,7 +336,7 @@ function createWindow() {
             });
 
             notesWindow.on('closed', () => {
-                notesWindow.hide();
+                //notesWindow.hide(); j'ai commenté ça, car avec cette ligne ça faisait un message d'erreur, mais qui ne faisait pas crash l'application
             });
 
             return { success: true };
@@ -435,4 +444,70 @@ app.on("activate", () => {
 app.whenReady().then(() => {
     createWindow();
     createTray();
+
+    // Handler pour ouvrir une fenêtre de report FUP
+    ipcMain.handle('open-report-window', async (event, data) => {
+        try {
+            const reportWindow = new BrowserWindow({
+                width: 320,
+                height: 320,
+                resizable: false,
+                frame: true,
+                title: 'Reporter le FUP',
+                webPreferences: {
+                    nodeIntegration: false,
+                    contextIsolation: true,
+                    enableRemoteModule: false
+                },
+                parent: win,
+                modal: true,
+                show: false
+            });
+
+            // Contenu HTML pour la popup de report
+            const reportHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Reporter le FUP</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; background: #222; color: #fff; margin: 0; padding: 24px; }
+                        h2 { font-size: 18px; margin-bottom: 16px; }
+                        .btns { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+                        button { padding: 8px 16px; border-radius: 6px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+                        .advance { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; }
+                        .report { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; }
+                        .cancel { background: #333; color: #aaa; border: 1px solid #555; margin-top: 18px; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Reporter le FUP</h2>
+                    <div class="btns">
+                        <button class="advance" onclick="window.report(-15)">Avancer de 15 min</button>
+                        <button class="advance" onclick="window.report(-30)">Avancer de 30 min</button>
+                        <button class="report" onclick="window.report(15)">Reporter de 15 min</button>
+                        <button class="report" onclick="window.report(30)">Reporter de 30 min</button>
+                        <button class="report" onclick="window.report(60)">Reporter de 1h</button>
+                    </div>
+                    <button class="cancel" onclick="window.close()">Annuler</button>
+                    <script>
+                        window.report = function(minutes) {
+                            window.close();
+                            window.opener.postMessage({ type: 'report-fup', minutes: minutes }, '*');
+                        }
+                    </script>
+                </body>
+                </html>
+            `;
+
+            reportWindow.loadURL(`data:text/html;charset=UTF-8,${encodeURIComponent(reportHtml)}`);
+            reportWindow.once('ready-to-show', () => reportWindow.show());
+            reportWindow.on('closed', () => {});
+            return { success: true };
+        } catch (error) {
+            console.error('Erreur création fenêtre report:', error);
+            return { error: error.message };
+        }
+    });
 });

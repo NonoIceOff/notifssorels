@@ -1,7 +1,7 @@
 {
     "name": "notifssorel",
     "productName": "NotificationsSorel",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Le logiciel de notifications FUP de Sorel Energies",
     "main": ".webpack/main",
     "scripts": {
@@ -32,7 +32,8 @@
         "@babel/core": "^7.28.3",
         "@babel/preset-env": "^7.28.3",
         "@babel/preset-react": "^7.27.1",
-        "@electron-forge/cli": "^7.8.3",
+    "@electron-forge/cli": "^7.8.3",
+    "@electron-forge/maker-dmg": "^7.8.3",
         "@electron-forge/maker-deb": "^7.8.3",
         "@electron-forge/maker-rpm": "^7.8.3",
         "@electron-forge/maker-squirrel": "^7.8.3",

@@ -74,7 +74,7 @@ export function useRappelsLogic(commercial) {
             gainNode.connect(audioContext.destination);
 
             oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-            gainNode.gain.setValueAtTime(1, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.25, audioContext.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
 
             oscillator.start(audioContext.currentTime);
